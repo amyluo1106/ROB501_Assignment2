@@ -1,6 +1,7 @@
 import numpy as np
 from numpy.linalg import inv, lstsq
 from scipy.linalg import null_space
+from scipy.ndimage.filters import *
 from matplotlib.path import Path
 
 # You may add support functions here, if desired.
@@ -163,7 +164,7 @@ def cross_junctions(I, bpoly, Wpts):
 
         Ipts.append(saddlept.T)
 
-    Ipts = np.array(Ipts).T
+    Ipts = np.array(Ipts).T.reshape(2, n)
 
     #------------------
 

@@ -63,13 +63,38 @@ def pose_estimate_nls(K, Twc_guess, Ipts, Wpts):
     while True:
         # 3. Save previous best pose estimate.
         # ...
+        R = Twc_guess[:-1, :-1]
+        t = Twc_guess[:-1, -1]
 
         # 4. Project each landmark into image, given current pose estimate.
         for i in np.arange(tp):
-            pass
+            # Extract world point xyz
+            Wpt = np.array([Wpts[0][i], Wpts[1][i], Wpts[2][i]])
+
+            # Calculate error between image and world points
+            Ipt = Wpt - t
+            error = K @ R.T @ Ipt
+            error /= error[-1]
+
+            # Setup residual matrix
+            dY[i:i+2,:] = np.array([error[0], error[1]]).T - np.array([Ipts[0][i], Ipts[1][i]]).T
+
+            # Find the Jacobian
+            J[i:i+2,:] = find_jacobian(K, Twc_guess, Wpt.T)
 
         # 5. Solve system of normal equations for this iteration.
         # ...
+        # Calculate perturbation
+        deltax = -inv(J.T @ J) @ J.T @ dY
+
+        # Get previous operating point
+        params_prev = epose_from_hpose(Twc_guess)
+
+        # Update operating point
+        params = params_prev + deltax
+
+        # Update estimate with new operating point
+        Twc_guess = hpose_from_epose(params)
 
         # 6. Check - converged?
         diff = norm(params - params_prev)
@@ -84,6 +109,7 @@ def pose_estimate_nls(K, Twc_guess, Ipts, Wpts):
         iter += 1
 
     # 7. Compute and return homogeneous pose matrix Twc.
+    Twc = Twc_guess
 
     #------------------
 
