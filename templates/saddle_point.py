@@ -32,8 +32,8 @@ def saddle_point(I):
     h, l = I.shape
     A = []
 
-    for x in range(l):
-        for y in range(h):
+    for y in range(h):
+        for x in range(l):
             A.append([x**2, x*y, y**2, x, y, 1])
 
     A = np.array(A)
