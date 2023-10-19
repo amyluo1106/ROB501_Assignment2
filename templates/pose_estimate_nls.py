@@ -1,8 +1,8 @@
 import numpy as np
 from numpy.linalg import inv, norm
 from find_jacobian import find_jacobian
-from support.dcm_from_rpy import dcm_from_rpy
-from support.rpy_from_dcm import rpy_from_dcm
+from dcm_from_rpy import dcm_from_rpy
+from rpy_from_dcm import rpy_from_dcm
 
 #----- Functions Go Below -----
 
@@ -77,10 +77,10 @@ def pose_estimate_nls(K, Twc_guess, Ipts, Wpts):
             error /= error[-1]
 
             # Setup residual matrix
-            dY[i:i+2,:] = np.array([error[0], error[1]]).T - np.array([Ipts[0][i], Ipts[1][i]]).T
+            dY[i:i+2,:] = np.array([np.array([error[0], error[1]]).T - np.array([Ipts[0][i], Ipts[1][i]]).T]).T
 
             # Find the Jacobian
-            J[i:i+2,:] = find_jacobian(K, Twc_guess, Wpt.T)
+            J[i:i+2,:] = find_jacobian(K, Twc_guess, np.array([Wpt]).T)
 
         # 5. Solve system of normal equations for this iteration.
         # ...
