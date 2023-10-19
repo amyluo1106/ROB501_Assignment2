@@ -129,13 +129,13 @@ def cross_junctions(I, bpoly, Wpts):
 
     n = Wpts.shape[1]
     Ipts = []
-    square_dim = Wpts[1][0] - Wpts[0][0]
+    square_dim = Wpts[0][1] - Wpts[0][0]
 
     # Estimate the location of bounding box corners in world frame
-    top_left = np.array([[min(Wpts[0]) - (1.5*square_dim)], [min(Wpts[1] - (1.15*square_dim))]])
-    top_right = np.array([[max(Wpts[0]) - (1.25*square_dim)], [min(Wpts[1] - (1.15*square_dim))]])
-    bottom_right = np.array([[max(Wpts[0]) - (1.25*square_dim)], [max(Wpts[1] - (1.15*square_dim))]])
-    bottom_left = np.array([[min(Wpts[0]) - (1.5*square_dim)], [max(Wpts[1] - (1.15*square_dim))]])
+    top_left = np.array([[min(Wpts[0]) - (1.3*square_dim)], [min(Wpts[1] - (1.15*square_dim))]])
+    top_right = np.array([[max(Wpts[0]) + (1.25*square_dim)], [min(Wpts[1] - (1.15*square_dim))]])
+    bottom_right = np.array([[max(Wpts[0]) + (1.25*square_dim)], [max(Wpts[1] + (1.15*square_dim))]])
+    bottom_left = np.array([[min(Wpts[0]) - (1.3*square_dim)], [max(Wpts[1] + (1.15*square_dim))]])
     bworld = np.hstack((top_left, top_right, bottom_right, bottom_left))
 
     # Compute homography matrix
@@ -145,6 +145,7 @@ def cross_junctions(I, bpoly, Wpts):
     for i in range(n):
         # Use homography matrix to find corresponding points
         point = np.array([[Wpts[0][i], Wpts[1][i], 1]]).T
+
         corresponding_point = H @ point
         corresponding_point /= corresponding_point[-1]
 
@@ -152,14 +153,15 @@ def cross_junctions(I, bpoly, Wpts):
         xmin = int(np.round(corresponding_point[0]-window))
         xmax = int(np.round(corresponding_point[0]+window))
         ymin = int(np.round(corresponding_point[1]-window))
-        ymax = int(np.round(corresponding_point[0]+window))
-        patch = I[ymin:ymax+1, xmin:xmax+1]
+        ymax = int(np.round(corresponding_point[1]+window))
+
+        patch = I[(ymin):(ymax+1), (xmin):(xmax+1)]
 
         # Find saddle point in the patch
         saddlept = saddle_point(patch)
-        saddlept += np.array([xmin, ymin]).T
+        saddlept += np.array([[xmin], [ymin]])
 
-        Ipts.append(saddlept)
+        Ipts.append(saddlept.T)
 
     Ipts = np.array(Ipts).T
 

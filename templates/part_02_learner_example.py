@@ -4,16 +4,16 @@ from imageio import imread
 from cross_junctions import cross_junctions
 
 # Load the world points.
-Wpts = np.load('../data/world_pts.npy')
+Wpts = np.load('../ROB501_Assignment2/data/world_pts.npy')
 
 # Load the example target image.
-I = imread("../images/target_01.png")
+I = imread("../ROB501_Assignment2/images/target_01.png")
 
 # Load the bounding polygon.
-bpoly = np.load('../data/bounds_01.npy')
+bpoly = np.load('../ROB501_Assignment2/data/bounds_01.npy')
 
 # Load the reference solution and compute yours.
-Ipts_ref = np.load('../data/cross_junctions_01.npy')
+Ipts_ref = np.load('../ROB501_Assignment2/data/cross_junctions_01.npy')
 Ipts = cross_junctions(I, bpoly, Wpts)
 
 # Plot the points to check!
